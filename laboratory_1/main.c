@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <stdbool.h> // to get rid of 1 and 0 
 
 // Utility
 void swap(int *a, int *b) {
@@ -19,7 +20,7 @@ void print(int *arr, int n) {
 
 void fill_arr(int *arr, int n) {
   for(int i = 0; i < n; i++) {
-    arr[i] = rand();
+    arr[i] = rand() % 100000;
   }
 }
 
@@ -30,11 +31,25 @@ double get_secs(struct timeval start, struct timeval stop) {
 // Sorts
 void bubble_sort(int *arr, int n) {
   for(int i = 0; i < n-1; i++) {
-    for(int j = 0; j < n - i - 1; j++) {
+    for(int j = 0; j < n-1; j++) {
       if(arr[j] > arr[j+1]) {
         swap(&arr[j], &arr[j+1]);
       }
     }
+  }
+}
+
+void fast_bubble_sort(int *arr, int n) {
+  bool changes;
+  for(int i = 0; i < n-1; i++) {
+    changes = false;
+    for(int j = 0; j < n-i-1; j++) {
+      if(arr[j] > arr[j+1]) {
+        swap(&arr[j], &arr[j+1]);
+        changes = true;
+      }
+    }
+    if(!changes) break;
   }
 }
 
@@ -53,7 +68,7 @@ void selection_sort(int *arr, int n) {
 void insertion_sort(int *arr, int n) {
   for(int i = 1; i < n; i++) {
     int index = i;
-    while(arr[index] < arr[index-1]) {
+    while(arr[index] < arr[index-1] && index > 0) {
       swap(&arr[index], &arr[index-1]);
       index -= 1;
     }
@@ -89,43 +104,15 @@ void fast_insertion_sort(int *arr, int n) {
 
 int main() {
   struct timeval start, stop;
-  double dif;
 
-  int num = 100000;
+  int num = 50000;
+  int example_array[num];
+  fill_arr(example_array, num);
 
-  int bubble[num];
-  int selection[num];
-  int insertion[num];
-  int fast_insertion[num]; 
-
-  fill_arr(bubble, num);
-  fill_arr(selection, num);
-  fill_arr(insertion, num);
-  fill_arr(fast_insertion, num);
-
-  // Bubble Sort
   gettimeofday(&start, NULL);
-  bubble_sort(bubble, num);
+  selection_sort(example_array, num);
   gettimeofday(&stop, NULL);
-  printf("Bubble: %f\n", get_secs(start, stop));
-
-  // Insertion Sort
-  gettimeofday(&start, NULL);
-  insertion_sort(insertion, num);
-  gettimeofday(&stop, NULL);
-  printf("Insertion: %f\n", get_secs(start, stop));
-  
-  // Selection Sort
-  gettimeofday(&start, NULL);
-  selection_sort(selection, num);
-  gettimeofday(&stop, NULL);
-  printf("Selection: %f\n", get_secs(start, stop));
-  
-  // Fast Insertion Sort
-  gettimeofday(&start, NULL);
-  fast_insertion_sort(fast_insertion, num);
-  gettimeofday(&stop, NULL);
-  printf("Fast Insertion: %f\n", get_secs(start, stop));
+  printf("Time dif: %f\n", get_secs(start, stop));
 
   return 0;
 }
