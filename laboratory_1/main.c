@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/time.h>
 #include <stdbool.h> // to get rid of 1 and 0 
 
@@ -8,6 +7,15 @@ void swap(int *a, int *b) {
   int temp = *a;
   *a = *b;
   *b = temp;
+}
+
+int my_rand(int seed) {
+  int sqr_seed = seed * seed;
+  int result = sqr_seed / 10 + sqr_seed % 10000;
+  if(result < 0) {
+    result = -result;
+  }
+  return result;
 }
 
 void print(int *arr, int n) {
@@ -19,8 +27,13 @@ void print(int *arr, int n) {
 }
 
 void fill_arr(int *arr, int n) {
+  struct timeval time;
+  gettimeofday(&time, NULL);
+
+  int seed = my_rand(time.tv_usec);
   for(int i = 0; i < n; i++) {
-    arr[i] = rand() % 100000;
+    seed = my_rand(seed);
+    arr[i] = my_rand(seed) % 10000;
   }
 }
 
@@ -105,7 +118,7 @@ void fast_insertion_sort(int *arr, int n) {
 int main() {
   struct timeval start, stop;
 
-  int num = 50000;
+  int num = 100000;
   int example_array[num];
   fill_arr(example_array, num);
 
