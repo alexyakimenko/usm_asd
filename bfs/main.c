@@ -80,7 +80,7 @@ typedef struct Node {
 } Node;
 
 typedef struct LinkedList {
- Node* head;
+  Node* head;
 } LinkedList;
 
 void print_list(LinkedList* list) {
@@ -115,6 +115,7 @@ Cell* pop_list(LinkedList* list) {
   list->head = list->head->next;
   return first;
 }
+
 int len_list(LinkedList* list) {
   Node* head = list->head;
   if(head == NULL) return 0;
