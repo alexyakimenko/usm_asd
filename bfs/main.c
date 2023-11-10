@@ -149,9 +149,7 @@ void get_neighbors(LinkedList* list, Grid* grid, Cell* cell, int start_val) {
 
   for(int i=0; i < 4; i++) {
     if(!is_pos_valid(grid, indices[i][0], indices[i][1])) continue; 
-    // printf("%d : %d\n", indices[i][0], indices[i][1]);
     Cell* neighbor = get_cell_at(grid, indices[i][0], indices[i][1]);
-    // printf("%dx%d:%d\n", neighbor->row, neighbor->col, neighbor->value);
     if(neighbor->value != start_val) continue;
     push_list(list, neighbor);
   }
