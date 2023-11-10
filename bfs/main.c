@@ -24,7 +24,7 @@ typedef struct Grid {
 } Grid;
 
 Cell* get_cell_at(Grid* grid, int row, int col) {
-  return grid->first_cell + col + row*grid->rows;
+  return grid->first_cell + col + row*grid->cols;
 }
 
 int get_grid_size(Grid* grid) {
@@ -34,7 +34,7 @@ int get_grid_size(Grid* grid) {
 void print_grid(Grid* grid) {
   for(int i=0; i < grid->rows; i++) {
     for(int j=0; j < grid->cols; j++) {
-      Cell* cell = grid->first_cell + j + (i*grid->rows);
+      Cell* cell = grid->first_cell + j + (i*grid->cols);
       printf("%d ", cell->value);
     }
     printf("\n");
@@ -87,7 +87,7 @@ void print_list(LinkedList* list) {
   Node* head = list->head;
 
   while(head != NULL) {
-    printf("%d ", head->cell->value);
+    printf("(%dx%d:%d) ", head->cell->row, head->cell->col, head->cell->value);
     head = head->next;
   }
 }
@@ -111,6 +111,7 @@ void push_list(LinkedList* list, Cell* cell) {
 
 Cell* pop_list(LinkedList* list) {
   Cell* first = list->head->cell;
+  Node* head = list->head;
   list->head = list->head->next;
   return first;
 }
@@ -130,9 +131,9 @@ int len_list(LinkedList* list) {
 int is_pos_valid(Grid* grid, int row, int col) {
   return !(
     (row < 0) ||
-    (row > grid->rows) ||
+    (row >= grid->rows) ||
     (col < 0) ||
-    (col > grid->cols)
+    (col >= grid->cols)
   );
 }
 
@@ -142,12 +143,14 @@ void get_neighbors(LinkedList* list, Grid* grid, Cell* cell, int start_val) {
     {cell->row-1, cell->col},
     {cell->row+1, cell->col},
     {cell->row, cell->col-1},
-    {cell->row, cell->row+1}
+    {cell->row, cell->col+1}
   };
 
   for(int i=0; i < 4; i++) {
     if(!is_pos_valid(grid, indices[i][0], indices[i][1])) continue; 
+    // printf("%d : %d\n", indices[i][0], indices[i][1]);
     Cell* neighbor = get_cell_at(grid, indices[i][0], indices[i][1]);
+    // printf("%dx%d:%d\n", neighbor->row, neighbor->col, neighbor->value);
     if(neighbor->value != start_val) continue;
     push_list(list, neighbor);
   }
@@ -157,7 +160,6 @@ void get_neighbors(LinkedList* list, Grid* grid, Cell* cell, int start_val) {
 void flood_fill(Grid* grid, int row, int col, int p) {
   Cell* start = get_cell_at(grid, row, col);
   int start_val = start->value;
-  printf("%d\n", start_val);
   int visited[grid->rows][grid->cols];
 
   // Fill array with 0s
@@ -166,9 +168,13 @@ void flood_fill(Grid* grid, int row, int col, int p) {
       visited[i][j] = 0;
     }
   }
+
   // Initializing linked list
   LinkedList queue;
   queue.head = NULL;
+
+  LinkedList neighbors;
+  neighbors.head = NULL;
 
   push_list(&queue, start);
   while(len_list(&queue) > 0)  {
@@ -177,9 +183,6 @@ void flood_fill(Grid* grid, int row, int col, int p) {
 
     first->value = p;
     visited[first->row][first->col] = 1;
-        
-    LinkedList neighbors;
-    neighbors.head = NULL;
     
     get_neighbors(&neighbors, grid, first, start_val);
 
@@ -196,15 +199,24 @@ int main() {
   FILE *fptr;
   fptr = fopen("img.map", "r");
   
-  
   Grid grid;
 
   parse_file(&grid, fptr);
   fclose(fptr);
-  
-  flood_fill(&grid, 3, 4, 2);
+
+  printf("Before:\n");
   print_grid(&grid);
+
+  printf("Write row, col, fill_num\n");
+  int row, col, p;
+  scanf("%i%i%i", &row, &col, &p);
   
+  // Algorithm
+  flood_fill(&grid, row, col, p);
+
+  printf("After:\n");
+  print_grid(&grid);
+
   free(grid.first_cell);
   return 0;
 }
