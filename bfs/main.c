@@ -196,7 +196,7 @@ void flood_fill(Grid* grid, int row, int col, int p) {
 int main() {
 
   FILE *fptr;
-  fptr = fopen("img.map", "r");
+  fptr = fopen("map.grid", "r");
   
   Grid grid;
 
