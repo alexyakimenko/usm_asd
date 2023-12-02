@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-
-const int ARR_LEN = 100;
+// max - 2096336
+const int ARR_LEN = 2096336;
 // Utility
 typedef struct Array {
   int* field;
@@ -40,13 +40,58 @@ void print_arr(Array* arr) {
 }
 
 // Sortings
-void merge_sort() {}
-void heap_sort() {}
+
+// Quick Sort
 void quick_sort() {}
+
+// Merge Sort
+void merge(Array* arr, int left, int middle, int right)
+{
+  int left_len = middle - left + 1;
+  int right_len = right - middle;
+
+  int left_arr[left_len], right_arr[right_len];
+
+  for (int i = 0; i < left_len; i++) left_arr[i] = arr->field[left + i];
+  for (int j = 0; j < right_len; j++) right_arr[j] = arr->field[middle + 1 + j];
+
+  int i = 0, j = 0, k = left;
+  while (i < left_len && j < right_len) {
+    if (left_arr[i] <= right_arr[j]) {
+        arr->field[k++] = left_arr[i++];
+    } else {
+        arr->field[k++] = right_arr[j++];
+    }
+  }
+
+  while (i < left_len) { arr->field[k++] = left_arr[i++]; }
+  while (j < right_len) { arr->field[k++] = right_arr[j++]; }
+}
+ 
+void merge_sort(Array* arr, int left, int right) {
+  if(left >= right) return;
+
+  int middle = (left + right) / 2;
+
+  merge_sort(arr, left, middle);
+  merge_sort(arr, middle+1, right);
+
+  merge(arr, left, middle, right);
+}
+
+// Heap Sort
+void heap_sort() {}
+
+
+// Callers
+void sort_quick(Array* arr) {
+  // call quick sort
+  print_arr(arr);
+}
 
 void sort_merge(Array* arr) {
   // call merge sort
-  print_arr(arr);
+  merge_sort(arr, 0, arr->len-1);
 }
 
 void sort_heap(Array* arr) {
@@ -54,16 +99,11 @@ void sort_heap(Array* arr) {
   print_arr(arr);
 }
 
-void sort_quick(Array* arr) {
-  // call quick sort
-  print_arr(arr);
-}
-
 int main() { 
   Array quick_arr;
   quick_arr.len = ARR_LEN;
-  fill_array(&quick_arr);
-  printf("Quick Sort (%d): %f\n", quick_arr.len, get_function_time(&quick_arr, sort_quick));
+  // fill_array(&quick_arr);
+  // printf("Quick Sort (%d): %f\n", quick_arr.len, get_function_time(&quick_arr, sort_quick));
 
   Array merge_arr;
   merge_arr.len = ARR_LEN;
@@ -72,8 +112,8 @@ int main() {
   
   Array heap_arr;
   heap_arr.len = ARR_LEN;
-  fill_array(&heap_arr);
-  printf("Heap Sort (%d):  %f\n", heap_arr.len, get_function_time(&heap_arr, sort_heap));
+  // fill_array(&heap_arr);
+  // printf("Heap Sort (%d):  %f\n", heap_arr.len, get_function_time(&heap_arr, sort_heap));
 
   return 0; 
 }
