@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-// max - 2096336
-const int ARR_LEN = 2096336;
+
+// max - 2096336 (for my compiler)
+const int ARR_LEN = 2000000;
+
 // Utility
 typedef struct Array {
   int* field;
@@ -21,6 +23,12 @@ double get_function_time(Array* arr, void (*caller)(Array*)) {
   (*caller)(arr);
   gettimeofday(&stop, NULL);
   return get_secs(start, stop);
+}
+
+void swap(int *a, int *b) {
+  int temp = *a;
+  *a = *b;
+  *b = temp;
 }
 
 void fill_array(Array* arr) {
@@ -42,7 +50,21 @@ void print_arr(Array* arr) {
 // Sortings
 
 // Quick Sort
-void quick_sort() {}
+void quick_sort(Array* arr, int left, int right) {
+  if(left >= right) return;
+
+  int left_val = arr->field[left];
+  int k = left;
+
+  for(int i = left+1; i <= right; i++) {
+    if(arr->field[i] < left_val) {
+      swap(&arr->field[i], &arr->field[++k]);
+    }
+  }
+  swap(&arr->field[left], &arr->field[k]);
+  quick_sort(arr, left, k-1);
+  quick_sort(arr, k+1, right);
+}
 
 // Merge Sort
 void merge(Array* arr, int left, int middle, int right)
@@ -86,7 +108,8 @@ void heap_sort() {}
 // Callers
 void sort_quick(Array* arr) {
   // call quick sort
-  print_arr(arr);
+  quick_sort(arr, 0, arr->len-1);
+  // print_arr(arr);
 }
 
 void sort_merge(Array* arr) {
@@ -102,8 +125,8 @@ void sort_heap(Array* arr) {
 int main() { 
   Array quick_arr;
   quick_arr.len = ARR_LEN;
-  // fill_array(&quick_arr);
-  // printf("Quick Sort (%d): %f\n", quick_arr.len, get_function_time(&quick_arr, sort_quick));
+  fill_array(&quick_arr);
+  printf("Quick Sort (%d): %f\n", quick_arr.len, get_function_time(&quick_arr, sort_quick));
 
   Array merge_arr;
   merge_arr.len = ARR_LEN;
