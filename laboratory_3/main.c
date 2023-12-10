@@ -61,6 +61,7 @@ void quick_sort(Array* arr, int left, int right) {
       swap(&arr->field[i], &arr->field[++k]);
     }
   }
+
   swap(&arr->field[left], &arr->field[k]);
   quick_sort(arr, left, k-1);
   quick_sort(arr, k+1, right);
